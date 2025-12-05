@@ -1,0 +1,99 @@
+﻿@model IEnumerable<SistemaCitasConsultorioDental.Models.Motivo>
+
+@{
+    ViewData["Title"] = "Motivos";
+}
+
+<div class="container-fluid">
+    <div class="row">
+
+
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 border-bottom">
+                <h1 class="h3">Motivos</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <a asp-controller="Motivos" asp-action="Create" class="btn btn-sm btn-primary">
+                        <i class="bi bi-person-plus me-1"></i> Nuevo Motivo
+                    </a>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover align-middle" id="tablaMotivos">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nombre</th>
+
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var p in Model)
+                                {
+                                    <tr>
+                                        <td>@p.Descripcion</td>
+
+                                        <td class="text-end">
+                                            <a asp-action="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-outline-secondary me-1" title="Editar">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <a asp-action="Details" asp-route-id="@p.Id" class="btn btn-sm btn-outline-info me-1" title="Detalles">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@p.Id" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" />
+}
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#tablaMotivos').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'csvHtml5',
+                        text: '<i class="bi bi-filetype-csv me-1"></i> Exportar CSV',
+                        className: 'btn btn-sm btn-outline-secondary',
+                        filename: function () {
+                            const tableId = this.table().node().id;
+                            return tableId || 'pacientes';
+                        }
+                    }
+                ],
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
+                },
+                lengthMenu: [5, 10, 25, 50, 100],
+                pageLength: 10,
+                order: [[0, 'asc']]
+            });
+        });
+    </script>
+}

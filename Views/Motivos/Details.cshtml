@@ -1,0 +1,55 @@
+﻿@model SistemaCitasConsultorioDental.Models.Motivo
+
+
+@{
+    ViewData["Title"] = "Detalles";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-calendar-plus me-2 fs-4"></i>
+                    <div>
+                        <h5 class="mb-0">Motivos</h5>
+                        <small class="text-white-50">Motivos de la cita.</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <form asp-action="Create" method="">
+                    <div class="mb-3">
+                        <small class="text-muted">
+                        </small>
+                    </div>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+                            <label asp-for="Descripcion" class="form-label"></label>
+                            <input asp-for="Descripcion" m class="form-control"  readonly />
+                            <span asp-validation-for="Descripcion" class="text-danger"></span>
+                        </div>
+
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            Volver a la lista
+                        </a>
+
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Edit" class="btn btn-outline-primary" asp-route-id="@Model?.Id">Editar</a> |
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+

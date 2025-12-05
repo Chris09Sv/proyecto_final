@@ -1,0 +1,176 @@
+﻿@model SistemaCitasConsultorioDental.Models.Cita
+
+@{
+    ViewData["Title"] = "Editar cita";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-calendar-check me-2 fs-4"></i>
+            <div>
+                <h1 class="h5 mb-0 text-capitalize">editar cita</h1>
+                <small>Completa la información para agendar la cita.</small>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <p class="text-muted mb-4">
+            Selecciona primero el dentista y la fecha; luego elige un horario disponible y el paciente.
+        </p>
+
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            @await Html.PartialAsync("_CitaForm", Model)
+
+            <hr class="my-4" />
+
+            <div class="d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    Volver a la lista
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save me-1"></i> Guardar cita
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        const fechaInput = document.getElementById("Fecha");
+        const dentistaSelectEl = document.getElementById("dentistaSelect");
+        const pacienteSelectEl = document.getElementById("pacienteSelect");
+        const horarioSelect = document.getElementById("horarioSelect");
+        const horaInput = document.getElementById("Hora");
+        const infoHorario = document.getElementById("infoHorarioDentista");
+
+        const horaActual = '@Model.Hora.ToString(@"hh\:mm")';
+        const dentistaIdActual = '@Model.DentistaId';
+        const dentistaNombreActual = '@(Model.Dentista?.Nombre + " " + Model.Dentista?.Apellido)';
+        const pacienteIdActual = '@Model.PacienteId';
+        const pacienteNombreActual = '@(Model.Paciente?.Nombre + " " + Model.Paciente?.Apellido)';
+
+        if (dentistaIdActual && dentistaNombreActual) {
+            const opt = new Option(dentistaNombreActual, dentistaIdActual, true, true);
+            dentistaSelectEl.appendChild(opt);
+        }
+
+        if (pacienteIdActual && pacienteNombreActual) {
+            const opt = new Option(pacienteNombreActual, pacienteIdActual, true, true);
+            pacienteSelectEl.appendChild(opt);
+        }
+
+        $('#dentistaSelect').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            placeholder: 'Seleccione un dentista...',
+            allowClear: true,
+            ajax: {
+                url: '/Citas/BuscarDentistas',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return { termino: params.term || '' };
+                },
+                processResults: function (data) {
+                    return { results: data };
+                }
+            }
+        });
+
+        $('#pacienteSelect').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            placeholder: 'Seleccione un paciente...',
+            allowClear: true,
+            ajax: {
+                url: '/Citas/BuscarPaciente',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return { termino: params.term || '' };
+                },
+                processResults: function (data) {
+                    return { results: data };
+                }
+            }
+        });
+
+        function limpiarHorarios() {
+            horarioSelect.innerHTML = '<option value="">Seleccione un horario...</option>';
+            if (!horaActual) {
+                horaInput.value = "";
+            }
+            infoHorario.textContent = "Seleccione fecha y dentista para ver horarios disponibles.";
+        }
+
+        function cargarHorariosDisponibles() {
+            const fecha = fechaInput.value;
+            const dentistaId = dentistaSelectEl.value;
+
+            if (!fecha || !dentistaId) {
+                limpiarHorarios();
+                return;
+            }
+
+            const duracion = 30;
+
+            fetch(`/Citas/HorariosDisponibles?dentistaId=${dentistaId}&fecha=${encodeURIComponent(fecha)}&duracionMinutos=${duracion}`)
+                .then(r => r.json())
+                .then(datos => {
+                    horarioSelect.innerHTML = '<option value="">Seleccione un horario...</option>';
+
+                    infoHorario.textContent = `Horario: ${datos.trabajaDe} - ${datos.trabajaHasta}.`;
+
+                    if (!datos.slots || datos.slots.length === 0) {
+                        const opt = document.createElement("option");
+                        opt.value = "";
+                        opt.textContent = "No hay horarios disponibles para este día.";
+                        horarioSelect.appendChild(opt);
+                        if (!horaActual) {
+                            horaInput.value = "";
+                        }
+                        return;
+                    }
+
+                    datos.slots.forEach(h => {
+                        const opt = document.createElement("option");
+                        opt.value = h;
+                        opt.textContent = h;
+                        horarioSelect.appendChild(opt);
+                    });
+
+                    if (horaActual && datos.slots.includes(horaActual)) {
+                        horarioSelect.value = horaActual;
+                        horaInput.value = horaActual;
+                    } else {
+                        horarioSelect.value = datos.slots[0];
+                        horaInput.value = datos.slots[0];
+                    }
+                });
+        }
+
+        fechaInput.addEventListener("change", cargarHorariosDisponibles);
+        dentistaSelectEl.addEventListener("change", cargarHorariosDisponibles);
+
+        horarioSelect.addEventListener("change", function () {
+            horaInput.value = this.value;
+        });
+
+        if (horaActual) {
+            horaInput.value = horaActual;
+        }
+
+        if (fechaInput.value && dentistaSelectEl.value) {
+            cargarHorariosDisponibles();
+        }
+    </script>
+}

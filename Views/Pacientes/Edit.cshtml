@@ -1,0 +1,49 @@
+﻿@model SistemaCitasConsultorioDental.Models.Paciente
+
+@{
+    ViewData["Title"] = "Editar paciente";
+}
+
+@await Html.PartialAsync("_PacienteForm", Model)
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        (function () {
+            const selEstado = document.getElementById('SinSeguroSelect');
+            const grupoAseg = document.getElementById('grupoAseguradora');
+            const selAseg = document.getElementById('SeguroMedico');
+            const nss = document.getElementById('NumeroSeguroSocial');
+
+            function actualizarSeguro() {
+                if (!selEstado || !grupoAseg || !selAseg || !nss) return;
+
+                const sinSeguro = selEstado.value === 'true';
+
+                if (sinSeguro) {
+                    grupoAseg.classList.add('d-none');
+
+                    if (!nss.value) nss.value = '00000000000';
+                    if (!selAseg.value) selAseg.value = 'SIN SEGURO';
+
+                    nss.readOnly = true;
+                } else {
+                    grupoAseg.classList.remove('d-none');
+                    nss.readOnly = false;
+
+                    if (nss.value === '00000000000') nss.value = '';
+                    if (selAseg.value === 'SIN SEGURO') selAseg.value = '';
+                }
+            }
+
+            if (selEstado) {
+                selEstado.addEventListener('change', actualizarSeguro);
+                actualizarSeguro(); 
+            }
+        })();
+    </script>
+}

@@ -1,0 +1,65 @@
+﻿@model SistemaCitasConsultorioDental.Models.Cita
+
+<div class="row g-3">
+
+    <div class="col-md-3">
+        <label asp-for="Fecha" class="form-label"></label>
+        <input asp-for="Fecha" class="form-control" type="date" id="Fecha" />
+        <span asp-validation-for="Fecha" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label">Dentista</label>
+
+        <select asp-for="DentistaId"
+                class="form-select"
+                id="dentistaSelect"
+                style="width:100%">
+
+            <option value="">Seleccione un dentista...</option>
+        </select>
+        <span asp-validation-for="DentistaId" class="text-danger"></span>
+
+        <small id="infoHorarioDentista" class="text-muted d-block mt-1">
+            Seleccione fecha y dentista para ver horarios disponibles.
+        </small>
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label">Horario disponible</label>
+        <select class="form-select" id="horarioSelect">
+            <option value="">Seleccione un horario...</option>
+        </select>
+        <small class="text-muted d-block">
+            Los horarios se cargan según el dentista, la fecha y una duración fija de 30 minutos.
+        </small>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Hora" class="form-label">Hora seleccionada</label>
+        <input asp-for="Hora" class="form-control" type="time" id="Hora" readonly />
+        <span asp-validation-for="Hora" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="MotivoId" class="form-label">Motivo</label>
+        <select asp-for="MotivoId"
+                asp-items="ViewBag.Motivos"
+                class="form-select">
+            <option value="">Seleccione un motivo...</option>
+        </select>
+        <span asp-validation-for="MotivoId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label">Paciente</label>
+        <select asp-for="PacienteId"
+                class="form-select"
+                id="pacienteSelect"
+                style="width:100%">
+            <option value="">Seleccione un paciente...</option>
+        </select>
+        <span asp-validation-for="PacienteId" class="text-danger"></span>
+    </div>
+
+</div>

@@ -1,0 +1,318 @@
+﻿@model IEnumerable<SistemaCitasConsultorioDental.Models.Cita>
+
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+<div class="container-fluid">
+    <div class="row">
+
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 border-bottom">
+                <h1 class="h3">Panel de control</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <a asp-controller="Citas" asp-action="Create" class="btn btn-sm btn-primary">
+                        <i class="bi bi-calendar-plus me-1"></i> Nueva cita
+                    </a>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-3 col-sm-6">
+                    <div class="card text-bg-light h-100">
+                        <div class="card-body">
+                            <h6 class="card-title text-muted">Pacientes</h6>
+                            <p class="display-6">@ViewBag.TotalPacientes</p>
+                            <a asp-controller="Pacientes" asp-action="Index" class="stretched-link"></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card text-bg-light h-100">
+                        <div class="card-body">
+                            <h6 class="card-title text-muted">Citas de hoy</h6>
+                            <p class="display-6">@ViewBag.CitasHoy</p>
+                            <a asp-controller="Citas" asp-action="Index" class="stretched-link"></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card text-bg-light h-100">
+                        <div class="card-body">
+                            <h6 class="card-title text-muted">Citas vigentes</h6>
+                            <p class="display-6">@ViewBag.CitasVigentes</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card text-bg-light h-100">
+                        <div class="card-body">
+                            <h6 class="card-title text-muted">Dentistas activos</h6>
+                            <p class="display-6">@ViewBag.TotalDentistas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-3">
+                <h5 class="mb-0">Citas en curso</h5>
+
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <button class="btn btn-sm btn-primary"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#citasProceso"
+                            aria-expanded="true"
+                            aria-controls="citasProceso">
+                        <i class="bi bi-chevron-down me-1"></i> Mostrar / ocultar
+                    </button>
+                </div>
+            </div>
+            @{
+                var enProceso = Model
+                .Where(c => c.Estado == "En proceso")
+                .ToList();
+            }
+
+            @if (!enProceso.Any())
+            {
+                <div class="alert alert-info">
+                    No hay citas en curso en este momento.
+                </div>
+            }
+            else
+            {
+
+
+
+                <div class="collapse show" id="citasProceso">
+
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover align-middle" id="tablaEnCurso">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Hora inicio</th>
+                                    <th>Hora fin</th>
+                                    <th>Dentista</th>
+                                    <th>Paciente</th>
+                                    <th>Motivo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var c in enProceso)
+                                {
+                                    var inicio = c.Fecha.Date + c.Hora;
+                                    var fin = inicio.AddMinutes(c.DuracionMinutos);
+
+                                    <tr>
+                                        <td>@inicio.ToString("HH:mm")</td>
+                                        <td>@fin.ToString("HH:mm")</td>
+                                        <td>@c.Dentista?.Nombre @c.Dentista?.Apellido</td>
+                                        <td>@c.Paciente?.Nombre @c.Paciente?.Apellido</td>
+                                        <td>@c.Motivo?.Descripcion</td>
+
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+
+            <hr class="my-4" />
+
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-3">
+                <h5 class="mb-0">Citas</h5>
+
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <button class="btn btn-sm btn-primary"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#citasVigentes"
+                            aria-expanded="true"
+                            aria-controls="citasVigentes">
+                        <i class="bi bi-chevron-down me-1"></i> Mostrar / ocultar
+                    </button>
+                </div>
+            </div>
+
+            @{
+                var vigentes = Model
+                .OrderByDescending(c => c.Fecha)              
+                .ThenByDescending(c => c.Hora)
+                .ToList();
+            }
+
+            @if (!vigentes.Any())
+            {
+                <div class="alert alert-info">
+                    No hay citas vigentes en este momento.
+                </div>
+            }
+            else
+            {
+                <div class="collapse show" id="citasVigentes">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover align-middle" id="tablaVigentes">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Fecha</th>
+
+                                    <th>Hora inicio</th>
+                                    <th>Hora fin</th>
+                                    <th>Dentista</th>
+                                    <th>Paciente</th>
+                                    <th>Motivo</th>
+                                    <th>Estado</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var c in vigentes)
+                                {
+                                    var inicio = c.Fecha.Date + c.Hora;
+                                    var fin = inicio.AddMinutes(c.DuracionMinutos);
+
+                                    <tr>
+                                        <td>@c.Fecha.ToString("dd/MM/yyyy")</td>
+
+                                        <td>@inicio.ToString("HH:mm")</td>
+                                        <td>@fin.ToString("HH:mm")</td>
+                                        <td>@c.Dentista?.Nombre @c.Dentista?.Apellido</td>
+                                        <td>@c.Paciente?.Nombre @c.Paciente?.Apellido</td>
+                                        <td>@c.Motivo?.Descripcion</td>
+                                        <td>@c.Estado</td>
+                                        <td class="text-end">
+                                            @if (c.Estado == "Vigente")
+                                            {
+                                                <a asp-action="Edit" asp-route-id="@c.Id"
+                                                   class="btn btn-sm btn-outline-secondary me-1" title="Editar">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
+
+                                                <a asp-action="Details" asp-route-id="@c.Id"
+                                                   class="btn btn-sm btn-outline-info me-1" title="Detalles">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+
+                                                <a asp-action="Delete" asp-route-id="@c.Id"
+                                                   class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a asp-action="Details" asp-route-id="@c.Id"
+                                                   class="btn btn-sm btn-outline-info" title="Detalles">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                            }
+                                        </td>
+
+
+
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+
+            <hr class="my-4" />
+
+            <h5 class="mb-3">Accesos rápidos</h5>
+            <div class="row g-2">
+                <div class="col-md-3 col-sm-6">
+                    <a asp-controller="Pacientes" asp-action="Create" class="btn w-100 btn-outline-primary">
+                        <i class="bi bi-person-plus me-1"></i> Nuevo paciente
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <a asp-controller="Citas" asp-action="Create" class="btn w-100 btn-outline-success">
+                        <i class="bi bi-calendar-plus me-1"></i> Nueva cita
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <a asp-controller="Dentistas" asp-action="Create" class="btn w-100 btn-outline-info">
+                        <i class="bi bi-person-badge me-1"></i> Nuevo dentista
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <a asp-controller="Motivos" asp-action="Create" class="btn w-100 btn-outline-warning">
+                        <i class="bi bi-plus-circle me-1"></i> Nuevo motivo
+                    </a>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" />
+}
+@section Scripts {
+
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            const opcionesComunes = {
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'csvHtml5',
+                        text: '<i class="bi bi-filetype-csv me-1"></i> Exportar CSV',
+                        className: 'btn btn-sm btn-outline-secondary'
+                    }
+                ],
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
+                },
+                lengthMenu: [5, 10, 25, 50, 100],
+                pageLength: 10
+            };
+
+            $('#tablaEnCurso').DataTable({
+            ...opcionesComunes,
+            buttons: [
+                {
+                    extend: 'csvHtml5',
+                    text: '<i class="bi bi-filetype-csv me-1"></i> Exportar CSV',
+                    className: 'btn btn-sm btn-outline-secondary',
+                    filename: function () {
+                        const hoy = new Date().toISOString().slice(0, 10);
+                        return `citas_en_curso_${hoy}`;
+                    }
+                }
+            ],
+            order: [[0, 'asc']]
+        });
+
+            $('#tablaVigentes').DataTable({
+            ...opcionesComunes,
+            buttons: [
+                {
+                    extend: 'csvHtml5',
+                    text: '<i class="bi bi-filetype-csv me-1"></i> Exportar CSV',
+                    className: 'btn btn-sm btn-outline-secondary',
+                    filename: function () {
+                        const hoy = new Date().toISOString().slice(0, 10);
+                        return `citas_pendientes_${hoy}`;
+                    }
+                }
+            ],
+            order: [[0, 'asc']]
+        });
+        });
+    </script>
+}

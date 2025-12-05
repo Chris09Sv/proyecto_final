@@ -1,0 +1,139 @@
+﻿@model SistemaCitasConsultorioDental.Models.Paciente
+
+@{
+    bool esEdicion = true;
+    var maxDate = DateTime.Now.AddYears(-8).ToString("yyyy-MM-dd");
+    var titulo = esEdicion ? "Detalles paciente" : "Registrar paciente";
+    var textoBoton = esEdicion ? "Guardar cambios" : "Guardar paciente";
+    var accion = esEdicion ? "ReadOnly" : "Create";
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-primary text-white rounded-top-4">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-clipboard-plus fs-3 me-2"></i>
+                        <div>
+                            <h5 class="mb-0">@titulo</h5>
+                            <small class="text-light opacity-75">Consultorio dental</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <p class="text-muted mb-4">
+                    </p>
+
+                    <form asp-action="@accion">
+                        @if (esEdicion)
+                        {
+                            <input asp-for="Id" type="hidden" />
+                        }
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Nombre" class="form-control" placeholder="Nombre" readonly />
+                                    <label asp-for="Nombre"></label>
+                                    <span asp-validation-for="Nombre" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Apellido" class="form-control" placeholder="Apellido" readonly />
+                                    <label asp-for="Apellido"></label>
+                                    <span asp-validation-for="Apellido" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Telefono" type="number" class="form-control" placeholder="Teléfono" readonly />
+                                    <label asp-for="Telefono"></label>
+                                    <span asp-validation-for="Telefono" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Email" class="form-control" placeholder="Email" readonly />
+                                    <label asp-for="Email"></label>
+                                    <span asp-validation-for="Email" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="FechaNacimiento"
+                                           type="date"
+                                           max="@maxDate"
+                                           class="form-control"
+                                           placeholder="Fecha de nacimiento" readonly />
+                                    <label asp-for="FechaNacimiento"></label>
+                                    <span asp-validation-for="FechaNacimiento" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Identificacion" class="form-control" placeholder="Identificación" maxlength="11" readonly />
+                                    <label asp-for="Identificacion"></label>
+                                    <span asp-validation-for="Identificacion" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input asp-for="Direccion" class="form-control" placeholder="Dirección" readonly />
+                                    <label asp-for="Direccion"></label>
+                                    <span asp-validation-for="Direccion" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+
+                            <div class="col-12 col-md-6">
+
+
+                                <div class="form-floating" id="grupoAseguradora">
+                                    <input asp-for="SeguroMedico" readonly
+                                            class="form-control"
+                                            id="SeguroMedico"> 
+                                    <label asp-for="SeguroMedico"></label>
+                                    <span asp-validation-for="SeguroMedico" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="NumeroSeguroSocial"
+                                           class="form-control"
+                                           placeholder="Número de Seguro Social"
+                                           id="NumeroSeguroSocial" readonly />
+                                    <label asp-for="NumeroSeguroSocial"></label>
+                                    <span asp-validation-for="NumeroSeguroSocial" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                        <div class="mt-4 d-grid gap-2">
+
+
+                            <a asp-action="Edit" class="btn btn-outline-primary" asp-route-id="@Model?.Id">Editar</a> 
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                Volver a la lista
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
